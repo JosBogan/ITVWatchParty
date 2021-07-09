@@ -15,12 +15,31 @@ const io = new Server(server, {
 
 const PORT = 8080;
 
+const roomData = {};
+
 io.on("connection", (socket) => {
   console.log("a user has connected");
+  // have object store that has room url, timestamp data etc.
 
-  socket.on("joinRoom", (roomId) => {
-    socket.join(roomId);
-    console.log("has joined " + roomId);
+  socket.on("serverUrlCheck", (roomId) => {
+    console.log(roomData[roomId]);
+    if (roomData[roomId]) {
+      socket.emit("clientUrlCheck", roomData[roomId].url);
+    }
+  });
+
+  socket.on("joinRoom", (data) => {
+    socket.join(data.roomId);
+
+    if (roomData[data.roomId]) {
+      socket.emit("joinedRoom", roomData[data.roomId]);
+    } else {
+      roomData[data.roomId] = {
+        url: data.url,
+      };
+    }
+
+    io.to(data.roomId).emit("userJoined", data.userName);
   });
 
   socket.on("chat message", (obj) => {
