@@ -22,21 +22,37 @@ io.on("connection", (socket) => {
   // have object store that has room url, timestamp data etc.
 
   socket.on("serverUrlCheck", (roomId) => {
-    console.log(roomData[roomId]);
+    console.log("urlCheckroomId", roomId);
     if (roomData[roomId]) {
-      socket.emit("clientUrlCheck", roomData[roomId].url);
+      socket.emit("roomFound", roomData[roomId].url);
+    } else {
+      socket.emit("roomNotFound", roomId);
     }
   });
 
+  socket.on("createRoom", (data) => {
+    console.log("creating Room", data);
+    socket.join(data.roomId);
+
+    roomData[data.roomId] = {
+      url: data.url,
+      roomId: data.roomId,
+    };
+    socket.emit("joinedRoom", roomData[data.roomId]);
+  });
+
+  socket.on("joinedRoom", (data) => {
+    console.log("joinedRoomData", data);
+  });
+
   socket.on("joinRoom", (data) => {
+    console.log(" join room Id", data.roomId);
     socket.join(data.roomId);
 
     if (roomData[data.roomId]) {
       socket.emit("joinedRoom", roomData[data.roomId]);
     } else {
-      roomData[data.roomId] = {
-        url: data.url,
-      };
+      console.log("Room not found - " + data.roomId);
     }
 
     io.to(data.roomId).emit("userJoined", data.userName);
