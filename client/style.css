@@ -47,3 +47,11 @@
   margin: 5px 5px;
 }
 /* #149CA3 */
+
+.joined_message_container {
+  color: rgb(196, 196, 196);
+  padding: 2px 10px;
+  border-radius: 5px;
+  display: inline-block;
+  margin: 5px 5px;
+}
